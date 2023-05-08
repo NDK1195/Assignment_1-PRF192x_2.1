@@ -6,12 +6,14 @@ const inputName = document.getElementById('input-name');
 const inputAge = document.getElementById('input-age');
 const selectType = document.getElementById('input-type');
 const inputWeight = document.getElementById('input-weight');
-const inputLength = document.getElementById('input-weight');
+const inputLength = document.getElementById('input-length');
 const inputColor = document.getElementById('input-color-1');
 const selectBreed = document.getElementById('input-breed');
 const checkboxVaccinated = document.getElementById('input-vaccinated');
 const checkboxDewormed = document.getElementById('input-dewormed');
 const checkboxSterilized = document.getElementById('input-sterilized');
+
+const tableBodyElement = document.getElementById('tbody');
 
 const petArr = [];
 /*-------------------------
@@ -23,15 +25,16 @@ const getDataFromInput = function () {
   const petData = {
     id: '',
     name: '',
-    age: '',
+    age: 0,
     type: '0',
-    weight: '',
-    length: '',
-    color: '#000',
+    weight: 0,
+    length: 0,
+    color: '#000000',
     breed: '0',
     vaccinated: false,
     dewormed: false,
     sterilized: false,
+    date: new Date(),
   };
 
   petData.id = inputID.value.trim();
@@ -75,30 +78,35 @@ const validateData = function (petData) {
         throw 'ID must be unique!';
       }
     }
+
     if (petData.name === '') {
       throw 'Please enter Pet Name!';
     }
-    if (petData.age === '') {
+
+    if (petData.age === 0) {
       throw 'Please enter Pet Age!';
     } else {
       if (petData.age < 1 || petData.age > 15) {
         throw 'Age must be between 1 and 15!';
       }
     }
-    if (petData.weight === '') {
+
+    if (petData.weight === 0) {
       throw 'Please enter Pet Weight!';
     } else {
       if (petData.weight < 1 || petData.weight > 15) {
         throw 'Weight must be between 1 and 15!';
       }
     }
-    if (petData.length === '') {
+
+    if (petData.length === 0) {
       throw 'Please enter Pet Length!';
     } else {
       if (petData.length < 1 || petData.length > 100) {
         throw 'Length must be between 1 and 100!';
       }
     }
+
     if (petData.type === '0') {
       throw 'Please select Pet Type!';
     }
@@ -112,6 +120,66 @@ const validateData = function (petData) {
   }
   return result;
 };
+
+// Clear input function
+const clearInput = function () {
+  inputID.value = '';
+  inputName.value = '';
+  inputAge.value = '';
+  selectType.value = '0';
+  inputWeight.value = '';
+  inputLength.value = '';
+  inputColor.value = '#000000';
+  selectBreed.value = '0';
+  checkboxVaccinated.checked = false;
+  checkboxDewormed.checked = false;
+  checkboxSterilized.checked = false;
+};
+// Render table data function
+const renderTableData = function (petArr) {
+  // Delete existing data
+  tableBodyElement.innerHTML = '';
+  // Add data to table
+  for (let i = 0; i < petArr.length; i++) {
+    // Create new row
+    const row = document.createElement('tr');
+    // Add data to new row;
+    row.innerHTML = `
+    <th scope="row">${petArr[i].id}</th>
+    <td>${petArr[i].name}</td>
+    <td>${petArr[i].age}</td>
+    <td>${petArr[i].type}</td>
+    <td>${petArr[i].weight} kg</td>
+    <td>${petArr[i].length} cm</td>
+    <td>${petArr[i].breed}</td>
+    <td>
+      <i class="bi bi-square-fill" style="color: ${petArr[i].color}"></i>
+    </td>
+    <td><i class="bi ${petArr[i].vaccinated ? 'bi-check-circle-fill' : 'bi-x-circle-fill'}"></i></td>
+    <td><i class="bi ${petArr[i].dewormed ? 'bi-check-circle-fill' : 'bi-x-circle-fill'}"></i></td>
+    <td><i class="bi ${petArr[i].sterilized ? 'bi-check-circle-fill' : 'bi-x-circle-fill'}"></i></td>
+    <td>${petArr[i].date.getDate()}/${petArr[i].date.getMonth() + 1}/${petArr[i].date.getFullYear()}</td>
+    <td><button type="button" class="btn btn-danger" onclick="deletePet('${petArr[i].id}')">Delete</button></td>`;
+
+    //Add row to table
+    tableBodyElement.appendChild(row);
+  }
+};
+
+// Delete pet function
+// Input: pet id
+const deletePet = function (petId) {
+  // Confirm before delete
+  if (confirm('Are you sure?')) {
+    const petIndex = petArr.findIndex(function (petObject) {
+      return petObject.id === petId;
+    });
+    // Delete pet
+    petArr.splice(petIndex, 1);
+    // Rerender table
+    renderTableData(petArr);
+  }
+};
 /*-------------------------
    HANDLE EVENTS
 ---------------------------*/
@@ -124,7 +192,9 @@ btnSubmit.addEventListener('click', function () {
   if (validateResult) {
     // Add pet object to pet array
     petArr.push(petObject);
-    console.log(petArr);
+    // Clear input
+    clearInput();
     // Display pet data
+    renderTableData(petArr);
   }
 });
