@@ -14,8 +14,11 @@ const checkboxDewormed = document.getElementById('input-dewormed');
 const checkboxSterilized = document.getElementById('input-sterilized');
 
 const tableBodyElement = document.getElementById('tbody');
-
+const btnHealthy = document.getElementById('healthy-btn');
+const btnCalculateBMI = document.getElementById('calculate-bmi-btn');
+// Global variables
 const petArr = [];
+let healthyCheck = false;
 /*-------------------------
    FUNCTIONS
 ---------------------------*/
@@ -91,6 +94,10 @@ const validateData = function (petData) {
       }
     }
 
+    if (petData.type === '0') {
+      throw 'Please select Pet Type!';
+    }
+
     if (petData.weight === 0) {
       throw 'Please enter Pet Weight!';
     } else {
@@ -105,10 +112,6 @@ const validateData = function (petData) {
       if (petData.length < 1 || petData.length > 100) {
         throw 'Length must be between 1 and 100!';
       }
-    }
-
-    if (petData.type === '0') {
-      throw 'Please select Pet Type!';
     }
 
     if (petData.breed === '0') {
@@ -158,6 +161,7 @@ const renderTableData = function (petArr) {
     <td><i class="bi ${petArr[i].vaccinated ? 'bi-check-circle-fill' : 'bi-x-circle-fill'}"></i></td>
     <td><i class="bi ${petArr[i].dewormed ? 'bi-check-circle-fill' : 'bi-x-circle-fill'}"></i></td>
     <td><i class="bi ${petArr[i].sterilized ? 'bi-check-circle-fill' : 'bi-x-circle-fill'}"></i></td>
+    <td>${petArr[i].BMI ? petArr[i].BMI : '?'}</td>
     <td>${petArr[i].date.getDate()}/${petArr[i].date.getMonth() + 1}/${petArr[i].date.getFullYear()}</td>
     <td><button type="button" class="btn btn-danger" onclick="deletePet('${petArr[i].id}')">Delete</button></td>`;
 
@@ -180,6 +184,26 @@ const deletePet = function (petId) {
     renderTableData(petArr);
   }
 };
+// Filter healthy pet function
+// Input: array of pet objects
+// Output: array of healthy pet objects pass the condition
+const filterHealthyPet = function (petArr) {
+  return petArr.filter(function (petObject) {
+    return petObject.vaccinated && petObject.dewormed && petObject.sterilized;
+  });
+};
+// Calculate BMI function
+// Input: array of pet objects
+// Output: array of pet object with BMI property added
+const calculateBMI = function (petArr) {
+  for (let i = 0; i < petArr.length; i++) {
+    if (petArr[i].type === 'Dog') {
+      petArr[i].BMI = ((petArr[i].weight * 703) / petArr[i].length ** 2).toFixed(2);
+    } else if (petArr[i].type === 'Cat') {
+      petArr[i].BMI = ((petArr[i].weight * 886) / petArr[i].length ** 2).toFixed(2);
+    }
+  }
+};
 /*-------------------------
    HANDLE EVENTS
 ---------------------------*/
@@ -197,4 +221,24 @@ btnSubmit.addEventListener('click', function () {
     // Display pet data
     renderTableData(petArr);
   }
+});
+
+// Handle healthy button click event
+btnHealthy.addEventListener('click', function () {
+  const healthyPetArr = filterHealthyPet(petArr);
+  //render table data base on healthy check condition
+  if (healthyCheck) {
+    renderTableData(petArr);
+    healthyCheck = false;
+  } else {
+    renderTableData(healthyPetArr);
+    healthyCheck = true;
+  }
+  btnHealthy.textContent = `${healthyCheck === false ? 'Show Healthy Pet' : 'Show All Pet'}`;
+});
+// Handle calculate BMI button click event
+btnCalculateBMI.addEventListener('click', function () {
+  // Calculate BMI and rerender table
+  calculateBMI(petArr);
+  renderTableData(petArr);
 });
