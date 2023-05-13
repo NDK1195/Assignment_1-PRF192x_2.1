@@ -28,12 +28,12 @@ const getDataFromInput = function () {
   const petData = {
     id: '',
     name: '',
-    age: 0,
-    type: '0',
-    weight: 0,
-    length: 0,
+    age: '',
+    type: '',
+    weight: '',
+    length: '',
     color: '#000000',
-    breed: '0',
+    breed: '',
     vaccinated: false,
     dewormed: false,
     sterilized: false,
@@ -85,7 +85,7 @@ const validateData = function (petData) {
     if (petData.name === '') {
       throw 'Please enter Pet Name!';
     }
-
+    // Number() converted empty string or white space only string to 0, if value === 0 => value not yet enter
     if (petData.age === 0) {
       throw 'Please enter Pet Age!';
     } else {
@@ -94,10 +94,10 @@ const validateData = function (petData) {
       }
     }
 
-    if (petData.type === '0') {
+    if (petData.type === '') {
       throw 'Please select Pet Type!';
     }
-
+    // Number() converted empty string or white space only string to 0, if value === 0 => value not yet enter
     if (petData.weight === 0) {
       throw 'Please enter Pet Weight!';
     } else {
@@ -105,7 +105,7 @@ const validateData = function (petData) {
         throw 'Weight must be between 1 and 15!';
       }
     }
-
+    // Number() converted empty string or white space only string to 0, if value === 0 => value not yet enter
     if (petData.length === 0) {
       throw 'Please enter Pet Length!';
     } else {
@@ -114,7 +114,7 @@ const validateData = function (petData) {
       }
     }
 
-    if (petData.breed === '0') {
+    if (petData.breed === '') {
       throw 'Please select Pet Breed!';
     }
   } catch (error) {
@@ -211,6 +211,7 @@ const calculateBMI = function (petArr) {
 btnSubmit.addEventListener('click', function () {
   // Get data from input
   const petObject = getDataFromInput();
+  console.log(petObject);
   // Validate data
   const validateResult = validateData(petObject);
   if (validateResult) {
